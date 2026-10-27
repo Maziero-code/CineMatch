@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CineMatch — Descoberta inteligente de filmes</title>
+  <meta name="description" content="Descubra filmes por gênero, nota e ano. Favorite, avalie e receba recomendações por similaridade." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#">
+        <span class="brand-mark"><i class="ph-fill ph-film-strip"></i></span>
+        <span class="brand-name">CineMatch</span>
+      </a>
+      <p class="tagline">Descoberta inteligente de filmes</p>
+      <span id="modeBadge" class="mode-badge">demo</span>
+      <button id="profileBtn" class="btn"><i class="ph ph-user"></i> Meu perfil</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section id="hero" class="hero" aria-label="Filme em destaque"></section>
+
+    <nav class="tabs" role="tablist" aria-label="Seções">
+      <button class="tab active" data-tab="catalog" role="tab" aria-selected="true">
+        <i class="ph ph-squares-four"></i> Catálogo
+      </button>
+      <button class="tab" data-tab="favorites" role="tab" aria-selected="false">
+        <i class="ph ph-heart"></i> Favoritos <span id="favCount" class="tab-count" hidden>0</span>
+      </button>
+    </nav>
+
+    <section id="tab-catalog" class="tab-panel" role="tabpanel">
+
+      <div id="genreChips" class="genre-chips" role="toolbar" aria-label="Filtrar por gênero"></div>
+
+      <div class="controls" aria-label="Busca e filtros">
+        <div class="search-row">
+          <input id="search" type="search" placeholder="Buscar por título…" autocomplete="off" aria-label="Buscar por título" />
+          <select id="sortBy" aria-label="Ordenar por">
+            <option value="popularity">Mais populares</option>
+            <option value="rating">Melhor avaliados</option>
+            <option value="year">Mais recentes</option>
+            <option value="title">Título (A–Z)</option>
+          </select>
+        </div>
+        <div class="filter-row">
+          <select id="genreFilter" aria-label="Filtrar por gênero">
+            <option value="">Todos os gêneros</option>
+          </select>
+          <select id="yearFilter" aria-label="Filtrar por ano">
+            <option value="">Todos os anos</option>
+          </select>
+          <label class="range-label">
+            <i class="ph ph-star"></i> Nota mínima
+            <input id="minRating" type="range" min="0" max="10" step="0.5" value="0" />
+            <span id="minRatingVal">0.0</span>
+          </label>
+          <button id="resetFilters" class="btn"><i class="ph ph-x"></i> Limpar</button>
+          <button id="surpriseBtn" class="btn btn-surprise"><i class="ph ph-dice-five"></i> Surpreenda-me</button>
+        </div>
+      </div>
+
+      <section aria-labelledby="resultsTitle">
+        <div class="section-head">
+          <h2 id="resultsTitle">Catálogo</h2>
+          <span id="resultsCount" class="muted"></span>
+        </div>
+        <div id="grid" class="grid"></div>
+        <p id="empty" class="empty" hidden>Nenhum filme encontrado com esses filtros.</p>
+      </section>
+
+      <section id="recoSection" aria-labelledby="recoTitle" hidden>
+        <div class="section-head">
+          <h2 id="recoTitle">Recomendados para você</h2>
+          <span class="muted">Baseado nos favoritos e avaliações</span>
+        </div>
+        <div id="recoGrid" class="grid"></div>
+      </section>
+
+    </section>
+
+    <section id="tab-favorites" class="tab-panel" role="tabpanel" hidden>
+
+      <div class="section-head" style="margin-top:32px">
+        <h2>Seus favoritos</h2>
+        <span id="favHeaderCount" class="muted"></span>
+      </div>
+
+      <div id="favGrid" class="grid"></div>
+
+      <div id="favEmpty" class="empty-state" hidden>
+        <span class="empty-state-icon"><i class="ph ph-heart"></i></span>
+        <h3>Nenhum favorito ainda</h3>
+        <p>Toque no coração de qualquer filme do catálogo para salvá-lo aqui.</p>
+        <button class="btn btn-primary" data-goto="catalog">Explorar catálogo</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="compareTray" class="compare-tray" hidden>
+    <div class="compare-slot" id="slot0"></div>
+    <span class="vs">VS</span>
+    <div class="compare-slot" id="slot1"></div>
+    <div class="compare-actions">
+      <button id="openCompare" class="btn btn-primary" disabled>Comparar</button>
+      <button id="clearCompare" class="btn">Limpar</button>
+    </div>
+  </div>
+
+  <dialog id="profileModal" class="modal">
+    <div class="modal-head">
+      <h2><i class="ph ph-user"></i> Perfil de gosto</h2>
+      <button class="btn btn-icon" data-close aria-label="Fechar"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="modal-body" id="profileBody"></div>
+  </dialog>
+
+  <dialog id="compareModal" class="modal">
+    <div class="modal-head">
+      <h2><i class="ph ph-arrows-left-right"></i> Comparação</h2>
+      <button class="btn btn-icon" data-close aria-label="Fechar"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="modal-body" id="compareBody"></div>
+  </dialog>
+
+  <dialog id="surpriseModal" class="modal modal-surprise">
+    <div class="modal-head">
+      <h2><i class="ph ph-dice-five"></i> Surpreenda-me</h2>
+      <button class="btn btn-icon" data-close aria-label="Fechar"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="modal-body" id="surpriseBody"></div>
+  </dialog>
+
+  <!-- MODAL DE DETALHES DO FILME (Trailer + Sinopse + Comentários) -->
+  <dialog id="movieModal" class="modal modal-movie">
+    <div class="modal-movie-content">
+      <button class="btn btn-icon modal-close-float" data-close aria-label="Fechar"><i class="ph ph-x"></i></button>
+      <div id="movieDetailsBody"></div>
+    </div>
+  </dialog>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      CineMatch · projeto de portfólio em HTML5, CSS3 e JavaScript ·
+      dados de demonstração locais<span id="footerApi" hidden> · catálogo via TMDB</span>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
